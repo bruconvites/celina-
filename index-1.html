@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fazendinha da Celina - 1 ano</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #000; font-family: "Segoe UI", Arial, sans-serif;
+  }
+  .tela {
+    position: fixed; inset: 0;
+    display: none; align-items: center; justify-content: center;
+    background: #000;
+  }
+  .tela.ativa { display: flex; }
+
+  /* Primeira página */
+  #telaInicio { cursor: pointer; }
+  #telaInicio img {
+    width: 100%; height: 100%; object-fit: contain; display: block;
+    user-select: none; -webkit-user-drag: none;
+  }
+
+  /* Vídeo */
+  #telaVideo video {
+    width: 100%; height: 100%; object-fit: contain; background: #000;
+  }
+  #btnPular {
+    position: absolute; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    padding: 12px 28px; border: 2px solid #f6d77a; border-radius: 999px;
+    background: rgba(0,0,0,.55); color: #fff3c4;
+    font-size: 16px; font-weight: 600; letter-spacing: .5px;
+    cursor: pointer; z-index: 20;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 14px rgba(246,215,122,.55);
+    transition: background .2s, transform .2s;
+  }
+  #btnPular:hover { background: rgba(0,0,0,.75); transform: translateX(-50%) scale(1.05); }
+
+  /* Página interativa */
+  #palco {
+    position: relative;
+    width: min(100vw, calc(100dvh * 941 / 1672));
+    aspect-ratio: 941 / 1672;
+  }
+  #palco img {
+    width: 100%; height: 100%; display: block;
+    user-select: none; -webkit-user-drag: none;
+  }
+  .zona {
+    position: absolute; display: block; border-radius: 28px;
+    cursor: pointer; top: 74.2%; height: 9.8%;
+  }
+  .zona:hover { box-shadow: 0 0 22px 6px rgba(246,215,122,.6); }
+  #zonaConfirmar { left: 8.5%; width: 39%; }
+  #zonaLocal     { left: 51.5%; width: 40%; }
+
+  /* Brilhos dourados */
+  .brilho {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: var(--s); height: var(--s);
+    margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+    background: radial-gradient(circle, #fffbe0 0%, #ffd700 40%, rgba(255,200,0,0) 70%);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    filter: drop-shadow(0 0 6px #ffd700);
+    animation: voar var(--d) ease-out forwards;
+  }
+  @keyframes voar {
+    0%   { transform: translate(0,0) scale(.2) rotate(0deg); opacity: 1; }
+    60%  { opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) scale(1.1) rotate(180deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1) Primeira página -->
+<div id="telaInicio" class="tela ativa">
+  <img src="primeira.jpg" alt="Clique no envelope para abrir seu convite">
+</div>
+
+<!-- 2) Vídeo -->
+<div id="telaVideo" class="tela">
+  <video id="video" src="video.mp4" playsinline webkit-playsinline preload="auto"></video>
+  <button id="btnPular" type="button">Pular introdução</button>
+</div>
+
+<!-- 3) Página interativa -->
+<div id="telaFinal" class="tela">
+  <div id="palco">
+    <img src="interativo.jpg" alt="Convite - Fazendinha da Celina 1 ano">
+    <a id="zonaConfirmar" class="zona" href="https://wa.link/x5q4yu" aria-label="Confirmar Presença"></a>
+    <a id="zonaLocal" class="zona" href="https://maps.app.goo.gl/FfXdecepn94TxYeA6?g_st=aw" aria-label="Ver Localização"></a>
+  </div>
+</div>
+
+<script>
+(function () {
+  var telaInicio = document.getElementById('telaInicio');
+  var telaVideo  = document.getElementById('telaVideo');
+  var telaFinal  = document.getElementById('telaFinal');
+  var video      = document.getElementById('video');
+  var btnPular   = document.getElementById('btnPular');
+
+  function mostrar(tela) {
+    [telaInicio, telaVideo, telaFinal].forEach(function (t) { t.classList.remove('ativa'); });
+    tela.classList.add('ativa');
+  }
+
+  /* ---------- Brilhos dourados ---------- */
+  function brilhos(x, y) {
+    var qtd = 18;
+    for (var i = 0; i < qtd; i++) {
+      var b = document.createElement('div');
+      b.className = 'brilho';
+      var ang = Math.random() * Math.PI * 2;
+      var dist = 40 + Math.random() * 90;
+      b.style.left = x + 'px';
+      b.style.top = y + 'px';
+      b.style.setProperty('--s', (8 + Math.random() * 18) + 'px');
+      b.style.setProperty('--x', Math.cos(ang) * dist + 'px');
+      b.style.setProperty('--y', Math.sin(ang) * dist + 'px');
+      b.style.setProperty('--d', (0.6 + Math.random() * 0.6) + 's');
+      document.body.appendChild(b);
+      setTimeout(function (el) { el.remove(); }, 1300, b);
+    }
+  }
+  document.addEventListener('pointerdown', function (e) { brilhos(e.clientX, e.clientY); }, true);
+
+  /* ---------- Fluxo ---------- */
+  function irParaFinal() {
+    try { video.pause(); } catch (e) {}
+    mostrar(telaFinal);
+  }
+
+  telaInicio.addEventListener('click', function () {
+    mostrar(telaVideo);
+    video.currentTime = 0;
+    var p = video.play();
+    if (p && p.catch) {
+      p.catch(function () {
+        // Se o navegador bloquear o som, tenta sem áudio
+        video.muted = true;
+        video.play().catch(irParaFinal);
+      });
+    }
+  });
+
+  video.addEventListener('ended', irParaFinal);
+  video.addEventListener('error', irParaFinal);
+
+  btnPular.addEventListener('click', function (e) {
+    e.stopPropagation();
+    irParaFinal();
+  });
+
+  /* ---------- Links (com pequeno atraso para ver os brilhos) ---------- */
+  document.querySelectorAll('.zona').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var url = a.href;
+      setTimeout(function () { window.location.href = url; }, 450);
+    });
+  });
+})();
+</script>
+</body>
+</html>
